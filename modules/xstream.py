@@ -88,4 +88,3 @@ class Stream(object):
                 extracted_frames.append(frame)
                 pbar.update(1)
             return extracted_frames
-        
