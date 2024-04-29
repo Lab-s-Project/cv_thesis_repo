@@ -23,6 +23,7 @@ class Stream(object):
     
     #get capture object
     def get_cap(self):
+        if not self.cap: self.load_cap()
         return self.cap
 
     #load capture object using cv2
@@ -58,7 +59,7 @@ class Stream(object):
 
             if not success:
                 xerr('cannot read frame or video reach the end.')
-                return 0
+                break
             
             frame = cv2.resize(frame, wh)
             cv2.imshow('Video Streaming', frame)
