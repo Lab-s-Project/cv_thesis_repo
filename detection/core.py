@@ -11,20 +11,26 @@ import numpy as np
 sys.path.append('..')
 from modules.xenum import ModelType, StreamType
 from modules import xconst
-from modules.xutils import xmsg, xerr
+from modules.xutils import xmsg, xerr, add_polygon
 
 #class handler for deep learning model operation
 class DLModel():
-    def __init__(self, model_type = ModelType.yolov8n, stream = None):
+    def __init__(self, model_type = ModelType.yolov8n, stream = None, config=None):
         self.model_type = model_type
         self.stream = stream
+        self.config = config
         self.model = None
         self.frames = []
+        self.risk_areas = None
 
     #load yolo model for detection
     def load_model(self):
         self.model = YOLO(f'{xconst.DL_MODEL_ROOT}/{self.model_type.value}.pt')
         return self.model
+
+    #add polygon to the prediction
+    def set_risk_area(self, coords):
+        self.risk_areas = coords
 
     #predict the list of frames extracted from video file
     def detect(self, extract=True, save_file = False, filename=None):
@@ -35,11 +41,12 @@ class DLModel():
         if (self.stream.stream_type is StreamType.file) and extract:
             frames = self.stream.extract_frames()
             for i in frames:
-                res = self.model(i, verbose=False, classes=[0, 2])
+                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
                 pred = res[0].plot()
                 self.frames.append(pred)
+                pred = cv2.resize(pred, self.config.show_windows_size)
+                if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
                 cv2.imshow('Prediction - Frame extracted', pred)
-
                 key = cv2.waitKey(1)
                 if key == ord('q'):
                     break
@@ -53,8 +60,9 @@ class DLModel():
                 res = self.model(frame, verbose=False, classes=[0, 2])
                 pred = res[0].plot()
                 self.frames.append(pred)
+                pred = cv2.resize(pred, self.config.show_windows_size)
+                if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
                 cv2.imshow('Prediction - Realtime', pred)
-
                 key = cv2.waitKey(1)
                 if key == ord('q'):
                     break

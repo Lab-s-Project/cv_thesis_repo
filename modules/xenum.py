@@ -24,3 +24,11 @@ class ModelType(Enum):
 
     def __str__(self):
         return self.value
+
+#enum for polygon type
+class PolygonType(Enum):
+    line = 'line'
+    curve = 'curve'
+
+    def __str__(self):
+        return self.value

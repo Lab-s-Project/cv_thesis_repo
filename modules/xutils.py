@@ -4,6 +4,8 @@
 #==============================#
 
 #import all required modules
+import cv2
+import numpy as np
 
 #print in message format
 def xmsg(msg: str):
@@ -13,19 +15,32 @@ def xmsg(msg: str):
 def xerr(error: str):
     print(f'[err]: {error}')
 
-#class for storing global variable across module scope
+#store configuration/variable for inner/outer function use
 class Config():
     def __init__(self):
-        self.__dynamic_vars = {}
+        #dictionary to store dynamic variables
+        self._dynamic_variables = {}
 
-    def __getattr__(self, name: str):
-        if name in self.__dynamic_vars:
-            return self.__dynamic_vars[name]
+    def __getattr__(self, name):
+        #this method is called when an attribute is not found
+        if name in self._dynamic_variables:
+            return self._dynamic_variables[name]
         else:
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
-    def __setattr__(self, name: str, value):
-        if name == '__dynamic_vars':
+    def __setattr__(self, name, value):
+        #this method is called when an attribute is set
+        if name == '_dynamic_variables':
+            #allow setting the _dynamic_variables attribute directly
             super().__setattr__(name, value)
         else:
-            self.__dynamic_vars['name'] = value
+            #set a dynamic variable
+            self._dynamic_variables[name] = value
+
+#redraw the polygon
+def add_polygon(frame, polygons):
+    for polygon_coords in polygons:
+        pts = np.array(polygon_coords, np.int32)
+        pts = pts.reshape((-1, 1, 2))
+        cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
+    return frame
