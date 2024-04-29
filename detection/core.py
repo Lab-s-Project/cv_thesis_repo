@@ -12,6 +12,8 @@ sys.path.append('..')
 from modules.xenum import ModelType, StreamType
 from modules import xconst
 from modules.xutils import xmsg, xerr, add_polygon
+from modules.xplot import XPlot
+import pickle
 
 #class handler for deep learning model operation
 class DLModel():
@@ -22,6 +24,7 @@ class DLModel():
         self.model = None
         self.frames = []
         self.risk_areas = None
+        self.results = []
 
     #load yolo model for detection
     def load_model(self):
@@ -42,7 +45,10 @@ class DLModel():
             frames = self.stream.extract_frames()
             for i in frames:
                 res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
-                pred = res[0].plot()
+                
+                self.results.append(res)
+                # pred = res[0].plot()
+                pred = XPlot(results=res).plot()
                 self.frames.append(pred)
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
@@ -58,7 +64,8 @@ class DLModel():
                     xerr('cannot read frame or video reach the end.')
                     break
                 res = self.model(frame, verbose=False, classes=[0, 2])
-                pred = res[0].plot()
+                # pred = res[0].plot()
+                pred = XPlot(results=res).plot()
                 self.frames.append(pred)
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
@@ -68,6 +75,13 @@ class DLModel():
                     break
             cap.release()
         cv2.destroyAllWindows()
+
+        # File path to save the pickle file
+        file_path = "results.pickle"
+
+        # Save the list to a pickle file
+        with open(file_path, 'wb') as f:
+            pickle.dump(self.results, f)
 
         #save prediction into mp4 file
         if save_file:
