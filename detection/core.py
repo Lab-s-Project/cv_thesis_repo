@@ -8,6 +8,7 @@ from ultralytics import YOLO
 import sys, cv2, os, uuid
 from datetime import datetime
 import numpy as np
+from .danger_detection import DangerDetection
 sys.path.append('..')
 from modules.xenum import ModelType, StreamType
 from modules import xconst
@@ -24,7 +25,7 @@ class DLModel():
         self.model = None
         self.frames = []
         self.risk_areas = None
-        self.results = []
+        # self.results = []
 
     #load yolo model for detection
     def load_model(self):
@@ -34,6 +35,7 @@ class DLModel():
     #add polygon to the prediction
     def set_risk_area(self, coords):
         self.risk_areas = coords
+        self.dangerD = DangerDetection()
 
     #predict the list of frames extracted from video file
     def detect(self, extract=True, save_file = False, filename=None):
@@ -46,7 +48,7 @@ class DLModel():
             for i in frames:
                 res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
                 
-                self.results.append(res)
+                # self.results.append(res)
                 # pred = res[0].plot()
                 pred = XPlot(results=res).plot()
                 self.frames.append(pred)
@@ -76,12 +78,12 @@ class DLModel():
             cap.release()
         cv2.destroyAllWindows()
 
-        # File path to save the pickle file
-        file_path = "results.pickle"
+        # # File path to save the pickle file
+        # file_path = "results.pickle"
 
-        # Save the list to a pickle file
-        with open(file_path, 'wb') as f:
-            pickle.dump(self.results, f)
+        # # Save the list to a pickle file
+        # with open(file_path, 'wb') as f:
+        #     pickle.dump(self.results, f)
 
         #save prediction into mp4 file
         if save_file:
