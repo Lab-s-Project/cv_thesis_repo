@@ -11,6 +11,10 @@ class XResult():
         self.result = results[0]
 
     @property
+    def xboxes(self):
+        return [XBoxes(boxes) for boxes in self.result.boxes]
+
+    @property
     def boxes(self):
         return self.result.boxes
         
@@ -52,3 +56,8 @@ class XResult():
           xcyc[i, 0] = xc
           xcyc[i, 1] = yc
         return xcyc
+
+class XBoxes(object):
+    def __init__(self, boxes):
+        self.boxes = boxes
+        self.danger = False

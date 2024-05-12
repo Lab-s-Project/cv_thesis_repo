@@ -36,7 +36,7 @@ class DLModel():
     #add polygon to the prediction
     def set_risk_area(self, coords):
         self.risk_areas = coords
-        # self.dangerD = DangerDetection()
+        self.dangerD = DangerDetection(self.risk_areas)
 
     #predict the list of frames extracted from video file
     def detect(self, extract=True, save_file = False, filename=None):
@@ -49,6 +49,7 @@ class DLModel():
             for i in frames:
                 res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
                 res = XResult(res)
+                res = self.dangerD.detect(result=res)
                 pred = XPlot(result=res).plot()
                 self.preds.append(pred)
                 pred = cv2.resize(pred, self.config.show_windows_size)
