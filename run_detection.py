@@ -13,7 +13,7 @@ import cv2
 
 #strating point of the detection
 if __name__ == '__main__':
-    # #global vars
+    #global vars
     config = Config()
     config.cam_windows_size = (1280, 720)
     config.show_windows_size = (1280, 720)
@@ -21,30 +21,18 @@ if __name__ == '__main__':
     # #define stream object
     stream = Stream(stream_type = StreamType.file)
     stream.set_file_location('./assets/videos/vid001.mp4')
-    cap = stream.get_cap()
+    # cap = stream.get_cap()
 
     # polygon = XPolygon(cap=cap, 
     #                    polygon_type=PolygonType.line, 
     #                    show_windows_size=config.show_windows_size)
     # polygons_list = polygon.draw()
-
-    # while cap.isOpened():
-    #     success, frame = cap.read()
-    #     if not success:
-    #         break
-    #     frame = cv2.resize(frame, config.show_windows_size)
-    #     frame = add_polygon(frame, polygons_list)
-    #     cv2.imshow('Prediction - Realtime', frame)
-
-    #     key = cv2.waitKey(1)
-    #     if key == ord('q'):
-    #         break
-    # cap.release()
-    # cv2.destroyAllWindows()
-
+    # print(polygons_list)
+    polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
+    
     #start prediction
-    dlmodel = DLModel(model_type=ModelType.yolov8n, 
+    dlmodel = DLModel(model_type=ModelType.yolov8l, 
                       stream=stream, 
                       config=config)
-    # dlmodel.set_risk_area(polygons_list)
+    dlmodel.set_risk_area(polygons_list)
     dlmodel.detect(extract=True)

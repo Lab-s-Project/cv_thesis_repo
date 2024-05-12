@@ -4,11 +4,13 @@
 #==============================#
 
 #import all required modules
-from ultralytics import YOLO
 import sys, cv2, os, uuid
+from ultralytics import YOLO
 from datetime import datetime
 import numpy as np
 from .danger_detection import DangerDetection
+from .xresult import XResult
+#change dir to import modules
 sys.path.append('..')
 from modules.xenum import ModelType, StreamType
 from modules import xconst
@@ -23,9 +25,8 @@ class DLModel():
         self.stream = stream
         self.config = config
         self.model = None
-        self.frames = []
+        self.preds = []
         self.risk_areas = None
-        # self.results = []
 
     #load yolo model for detection
     def load_model(self):
@@ -35,11 +36,11 @@ class DLModel():
     #add polygon to the prediction
     def set_risk_area(self, coords):
         self.risk_areas = coords
-        self.dangerD = DangerDetection()
+        # self.dangerD = DangerDetection()
 
     #predict the list of frames extracted from video file
     def detect(self, extract=True, save_file = False, filename=None):
-        #laod model if it is not loaded yet
+        #load model if it is not loaded yet
         if not self.model: self.load_model()
         
         #extract the frames before prediction instread of realtime prediction
@@ -47,11 +48,9 @@ class DLModel():
             frames = self.stream.extract_frames()
             for i in frames:
                 res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
-                
-                # self.results.append(res)
-                # pred = res[0].plot()
-                pred = XPlot(results=res).plot()
-                self.frames.append(pred)
+                res = XResult(res)
+                pred = XPlot(result=res).plot()
+                self.preds.append(pred)
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
                 cv2.imshow('Prediction - Frame extracted', pred)
@@ -66,9 +65,9 @@ class DLModel():
                     xerr('cannot read frame or video reach the end.')
                     break
                 res = self.model(frame, verbose=False, classes=[0, 2])
-                # pred = res[0].plot()
-                pred = XPlot(results=res).plot()
-                self.frames.append(pred)
+                res = XResult(res)
+                pred = XPlot(result=res).plot()
+                self.preds.append(pred)
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
                 cv2.imshow('Prediction - Realtime', pred)
@@ -77,13 +76,6 @@ class DLModel():
                     break
             cap.release()
         cv2.destroyAllWindows()
-
-        # # File path to save the pickle file
-        # file_path = "results.pickle"
-
-        # # Save the list to a pickle file
-        # with open(file_path, 'wb') as f:
-        #     pickle.dump(self.results, f)
 
         #save prediction into mp4 file
         if save_file:
@@ -98,15 +90,15 @@ class DLModel():
         #validate the stream type
         if self.stream.stream_type is not StreamType.file:
             xerr('only stream_type=file can be saved as a file.')
-            return 0 
+            return 0
         xmsg(f'wait - start saving prediction into file: "{filename}"')
-        num_frames, height, width, _ = np.array(self.frames).shape
+        num_frames, height, width, _ = np.array(self.preds).shape
         codec_id = "mp4v" # ID for a video codec.
         fourcc = cv2.VideoWriter_fourcc(*codec_id)
         out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=30, frameSize=(width, height))
 
         #write frames into file one by one
         for i in range(num_frames):
-            out.write(np.array(self.frames)[i, :, :, :])
+            out.write(np.array(self.preds)[i, :, :, :])
         out.release()
         xmsg(f'file successfully saved as: "{filename}"')

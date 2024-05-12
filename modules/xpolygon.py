@@ -35,9 +35,9 @@ class XPolygon(object):
 
     def redraw_polygons(self):
         for polygon in self.polygons:
-            cv2.polylines(self.frame, [np.array(polygon[-2:])], isClosed=True, color=(0, 0, 255), thickness=2)
+            cv2.polylines(img=self.frame, pts=[np.array(polygon[-2:])], isClosed=True, color=(0, 0, 255), thickness=2)
         for point in [i for j in self.polygons for i in j]:
-            cv2.circle(self.frame, point, 5, (255, 0, 0), -1)
+            cv2.circle(img=self.frame, center=point, radius=5, color=(255, 0, 0), thickness=-1, lineType=cv2.LINE_AA)
 
     def draw_line_callback(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -70,7 +70,7 @@ class XPolygon(object):
     def redraw_curve(self):
         for polygon in self.polygons:
             for i in range(len(polygon) - 1):
-                cv2.line(self.frame, polygon[i], polygon[i + 1], (0, 0, 255), 2)
+                cv2.line(img=self.frame, pt1=polygon[i], pt2=polygon[i + 1], color=(0, 0, 255), thickness=2)
 
     def draw_curve_callback(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
