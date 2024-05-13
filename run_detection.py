@@ -19,7 +19,7 @@ if __name__ == '__main__':
     config.show_windows_size = (1280, 720)
 
     # #define stream object
-    stream = Stream(stream_type = StreamType.file)
+    stream = Stream(stream_type = StreamType.file, config = config)
     stream.set_file_location('./assets/videos/vid001.mp4')
     # cap = stream.get_cap()
 

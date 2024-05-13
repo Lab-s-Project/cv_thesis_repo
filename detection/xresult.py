@@ -9,10 +9,17 @@ import numpy as np
 class XResult():
     def __init__(self, results):
         self.result = results[0]
+        self._xboxes = []
 
     @property
     def xboxes(self):
-        return [XBoxes(boxes) for boxes in self.result.boxes]
+        if len(self._xboxes) == 0: 
+            self._xboxes = [XBoxes(boxes) for boxes in self.result.boxes]
+        return self._xboxes
+    
+    @xboxes.setter
+    def xboxes(self, d):
+        self._xboxes = d
 
     @property
     def boxes(self):
@@ -45,6 +52,17 @@ class XResult():
     @property
     def xywh(self):
         return self.boxes.xywh.cpu().numpy().astype(int)
+    
+    @property
+    def leg_xcyc(self):
+        xcyc = np.empty((len(self.boxes), 2), dtype=int)
+        for i, row in enumerate(self.xyxy):
+          x1, y1, x2, y2 = row
+          xc = int((x1 + x2) / 2)
+          yc = (y2 - 10)
+          xcyc[i, 0] = xc
+          xcyc[i, 1] = yc
+        return xcyc
 
     @property
     def xcyc(self):
@@ -60,4 +78,5 @@ class XResult():
 class XBoxes(object):
     def __init__(self, boxes):
         self.boxes = boxes
-        self.danger = False
+        self.is_danger = False
+        self.danger_level = 0

@@ -10,13 +10,15 @@ from tqdm import tqdm
 import cv2
 import os
 import pickle
+from modules.xutils import Config
 
 #class for managing stream
 class Stream(object):
-    def __init__(self, stream_type: StreamType):
+    def __init__(self, stream_type: StreamType, config: Config):
         self.stream_type = stream_type
         self.file_location = None
         self.cap = None
+        self.config = config
 
     #set file for loading cap from (eg. video file)
     def set_file_location(self, loc):
@@ -87,13 +89,14 @@ class Stream(object):
             # for frame_idx in range(total_frames):
             #     success, frame = cap.read()
             #     if not success: break
+            #     frame = cv2.resize(frame, self.config.cam_windows_size)
             #     extracted_frames.append(frame)
             #     pbar.update(1)
 
             #====start development
             file_path = "./assets/videos/vid001.pickle"
             # with open(file_path, 'wb') as f:
-            #     pickle.dump(extracted_frames, f)
+                # pickle.dump(extracted_frames, f)
             #====end development
 
             with open(file_path, 'rb') as f:

@@ -4,7 +4,7 @@
 #==============================#
 
 #import all required modules
-import sys, cv2, os, uuid
+import sys, cv2, os, uuid, time
 from ultralytics import YOLO
 from datetime import datetime
 import numpy as np
@@ -55,7 +55,7 @@ class DLModel():
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
                 cv2.imshow('Prediction - Frame extracted', pred)
-                key = cv2.waitKey(1)
+                key = cv2.waitKey(1) & 0xFF
                 if key == ord('q'):
                     break
         else:
@@ -72,7 +72,7 @@ class DLModel():
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
                 cv2.imshow('Prediction - Realtime', pred)
-                key = cv2.waitKey(1)
+                key = cv2.waitKey(1) & 0xFF
                 if key == ord('q'):
                     break
             cap.release()
