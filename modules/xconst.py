@@ -17,3 +17,12 @@ color = Config()
 color.GREENISH=(0, 181, 6)
 color.RED=(0, 0, 255)
 color.WHITE=(255, 255, 255)
+
+#plotting configuratiion
+plot_config = Config()
+plot_config.bounding_box=False
+plot_config.class_label=True
+plot_config.distance_line=True
+plot_config.bottom_point=True
+plot_config.danger_level=True
+plot_config.bottom_ellipse=True

@@ -47,10 +47,10 @@ class DLModel():
         if (self.stream.stream_type is StreamType.file) and extract:
             frames = self.stream.extract_frames()
             for i in frames:
-                # res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
-                res = self.model.track(i, tracker='bytetrack.yaml', verbose=False, classes=xconst.DETECT_YOLO_CLASS, persist=True)
+                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
+                # res = self.model.track(i, tracker='bytetrack.yaml', verbose=False, classes=xconst.DETECT_YOLO_CLASS, persist=True)
                 res = self.dangerD.detect(result=XResult(res))
-                pred = XPlot(result=res).plot()
+                pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas, color=polygon_color)
@@ -67,11 +67,12 @@ class DLModel():
                     xerr('cannot read frame or video reach the end.')
                     break
                 res = self.model(frame, verbose=False, classes=[0, 2])
-                res = XResult(res)
-                pred = XPlot(result=res).plot()
-                self.preds.append(pred)
+                res = self.dangerD.detect(result=XResult(res))
+                pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
+                polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
+                self.preds.append(pred)
                 cv2.imshow('Prediction - Realtime', pred)
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord('q'):
@@ -99,7 +100,7 @@ class DLModel():
         num_frames, height, width, _ = np.array(self.preds).shape
         codec_id = "mp4v" # ID for a video codec.
         fourcc = cv2.VideoWriter_fourcc(*codec_id)
-        out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=10, frameSize=(width, height))
+        out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=7, frameSize=(width, height))
 
         #write frames into file one by one
         start_time = time.time()

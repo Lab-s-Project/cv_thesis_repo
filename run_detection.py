@@ -35,4 +35,4 @@ if __name__ == '__main__':
                       stream=stream, 
                       config=config)
     dlmodel.set_risk_area(polygons_list)
-    dlmodel.detect(extract=True, save_file=False)
+    dlmodel.detect(extract=True, save_file=True)
