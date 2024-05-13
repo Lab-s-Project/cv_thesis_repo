@@ -47,13 +47,14 @@ class DLModel():
         if (self.stream.stream_type is StreamType.file) and extract:
             frames = self.stream.extract_frames()
             for i in frames:
-                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
-                res = XResult(res)
-                res = self.dangerD.detect(result=res)
+                # res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
+                res = self.model.track(i, tracker='bytetrack.yaml', verbose=False, classes=xconst.DETECT_YOLO_CLASS, persist=True)
+                res = self.dangerD.detect(result=XResult(res))
                 pred = XPlot(result=res).plot()
-                self.preds.append(pred)
                 pred = cv2.resize(pred, self.config.show_windows_size)
-                if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
+                polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
+                if self.risk_areas: pred = add_polygon(pred, self.risk_areas, color=polygon_color)
+                self.preds.append(pred)
                 cv2.imshow('Prediction - Frame extracted', pred)
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord('q'):
@@ -93,13 +94,20 @@ class DLModel():
             xerr('only stream_type=file can be saved as a file.')
             return 0
         xmsg(f'wait - start saving prediction into file: "{filename}"')
+
+        #prepare videowriter object
         num_frames, height, width, _ = np.array(self.preds).shape
         codec_id = "mp4v" # ID for a video codec.
         fourcc = cv2.VideoWriter_fourcc(*codec_id)
-        out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=30, frameSize=(width, height))
+        out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=10, frameSize=(width, height))
 
         #write frames into file one by one
-        for i in range(num_frames):
-            out.write(np.array(self.preds)[i, :, :, :])
+        start_time = time.time()
+        for pred_frame in self.preds:
+            out.write(pred_frame)
         out.release()
-        xmsg(f'file successfully saved as: "{filename}"')
+
+        #calculate saving time
+        end_time = time.time()  # Record end time
+        saving_time = end_time - start_time
+        xmsg(f'file successfully saved as: "{filename}" | Saving time: {saving_time} seconds')

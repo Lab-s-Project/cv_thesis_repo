@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # #define stream object
     stream = Stream(stream_type = StreamType.file, config = config)
     stream.set_file_location('./assets/videos/vid001.mp4')
-    # cap = stream.get_cap()
+    cap = stream.get_cap()
 
     # polygon = XPolygon(cap=cap, 
     #                    polygon_type=PolygonType.line, 
@@ -35,4 +35,4 @@ if __name__ == '__main__':
                       stream=stream, 
                       config=config)
     dlmodel.set_risk_area(polygons_list)
-    dlmodel.detect(extract=True)
+    dlmodel.detect(extract=True, save_file=False)

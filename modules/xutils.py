@@ -38,9 +38,9 @@ class Config():
             self._dynamic_variables[name] = value
 
 #redraw the polygon
-def add_polygon(frame, polygons):
+def add_polygon(frame, polygons, color=(255, 0, 0)):
     for polygon_coords in polygons:
         pts = np.array(polygon_coords, np.int32)
         pts = pts.reshape((-1, 1, 2))
-        cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
+        cv2.polylines(frame, [pts], isClosed=True, color=color, thickness=1, lineType=cv2.LINE_AA)
     return frame

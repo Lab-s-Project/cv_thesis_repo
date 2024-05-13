@@ -10,6 +10,7 @@ class XResult():
     def __init__(self, results):
         self.result = results[0]
         self._xboxes = []
+        self.danger_level = [0]
 
     @property
     def xboxes(self):
@@ -79,4 +80,4 @@ class XBoxes(object):
     def __init__(self, boxes):
         self.boxes = boxes
         self.is_danger = False
-        self.danger_level = 0
+        # self.danger_level = 0
