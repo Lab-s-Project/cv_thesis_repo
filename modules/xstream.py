@@ -9,6 +9,7 @@ from .xenum import StreamType
 from .xutils import xmsg, xerr
 from tqdm import tqdm
 from modules.xutils import Config
+from modules import xconst
 
 #class for managing stream
 class Stream(object):
@@ -80,26 +81,27 @@ class Stream(object):
             xerr('only stream_type=file can extract frame from file.')
             return None
         else:
-            # if not self.validate_cap(): return 0
-            # total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            # pbar = tqdm(total=total_frames, desc="Extracting frames", position=0, leave=True)
-            # extracted_frames = []
-            # cap = self.load_cap()
-            # xmsg(f'start extracting frames | total frames: {total_frames}')
-            # for frame_idx in range(total_frames):
-            #     success, frame = cap.read()
-            #     if not success: break
-            #     frame = cv2.resize(frame, self.config.cam_windows_size)
-            #     extracted_frames.append(frame)
-            #     pbar.update(1)
+            if not xconst.DEVELOPMENT:
+                if not self.validate_cap(): return 0
+                total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                pbar = tqdm(total=total_frames, desc="Extracting frames", position=0, leave=True)
+                extracted_frames = []
+                cap = self.load_cap()
+                xmsg(f'start extracting frames | total frames: {total_frames}')
+                for frame_idx in range(total_frames):
+                    success, frame = cap.read()
+                    if not success: break
+                    frame = cv2.resize(frame, self.config.cam_windows_size)
+                    extracted_frames.append(frame)
+                    pbar.update(1)
+                return extracted_frames
+            else:
 
-            #====start development
-            file_path = "./assets/videos/vid001.pickle"
-            # with open(file_path, 'wb') as f:
-                # pickle.dump(extracted_frames, f)
-            #====end development
-
-            with open(file_path, 'rb') as f:
-                extracted_frames = pickle.load(f)
-
-            return extracted_frames
+                file_path = "./assets/videos/vid001.pickle"
+                # with open(file_path, 'wb') as f:
+                    # pickle.dump(extracted_frames, f)
+                #====end development
+                extracted_frames = []
+                with open(file_path, 'rb') as f:
+                    extracted_frames = pickle.load(f)
+                return extracted_frames

@@ -27,7 +27,7 @@ if __name__ == '__main__':
                        polygon_type=PolygonType.line, 
                        show_windows_size=config.show_windows_size)
     polygons_list = polygon.draw()
-    print(polygons_list)
+    # print(polygons_list)
     # polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
     
     #start prediction
@@ -35,4 +35,4 @@ if __name__ == '__main__':
                       stream=stream, 
                       config=config)
     dlmodel.set_risk_area(polygons_list)
-    dlmodel.detect(extract=True, save_file=True)
+    dlmodel.detect(extract=True, save_file=False)

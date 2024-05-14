@@ -49,13 +49,13 @@ class XPlot(object):
             #dynamic class label background width
             if class_id == 0: 
                 cls_label_x1y1, cls_label_x2y2 = (xc-7, yc-15), (xc+82, yc+12)
-                # cv2.rectangle(self.img, (x1, y2-20), (x2, y2), bb_color, thickness=self.bb_thickness, lineType=cv2.LINE_AA)
+                # cv2.rectangle(self.img, (x1, y2-10), (x2, y2), bb_color, thickness=self.bb_thickness, lineType=cv2.LINE_AA)
                 if self.config.bottom_point: cv2.circle(self.img, (leg_xc, leg_yc), 3, class_bg_color, -1, cv2.LINE_AA)
 
                 # cv2.circle(self.img, (leg_xc, leg_yc), 30, bb_color, 1, cv2.LINE_AA)
                 if self.config.bottom_ellipse:
-                    cv2.ellipse(self.img, (leg_xc, leg_yc), (20, 20), 0, 30, 150, bb_color, 2)
-                    cv2.ellipse(self.img, (leg_xc, leg_yc), (15, 15), 0, 30, 150, bb_color, 2)
+                    cv2.ellipse(self.img, (leg_xc, leg_yc), (15, 15), 0, 20, 160, bb_color, 2)
+                    cv2.ellipse(self.img, (leg_xc, leg_yc), (10, 10), 0, 20, 160, bb_color, 2)
             
             elif class_id == 2:
                 if self.config.bottom_point: cv2.circle(self.img, (leg_xc, leg_yc), 3, class_bg_color, -1, cv2.LINE_AA)

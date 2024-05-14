@@ -39,7 +39,6 @@ class Config():
 
 #redraw the polygon
 def add_polygon(frame, polygons, color=(255, 0, 0)):
-    xmsg('adding polygon plot on the video frame.')
     for polygon_coords in polygons:
         pts = np.array(polygon_coords, np.int32)
         pts = pts.reshape((-1, 1, 2))

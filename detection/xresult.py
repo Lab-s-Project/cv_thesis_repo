@@ -67,7 +67,7 @@ class XResult():
         for i, row in enumerate(self.xyxy):
           x1, y1, x2, y2 = row
           xc = int((x1 + x2) / 2)
-          yc = (y2 - 10)
+          yc = (y2 - 5) #5pixel from the bottom of the bounding box
           xcyc[i, 0] = xc
           xcyc[i, 1] = yc
         return xcyc
