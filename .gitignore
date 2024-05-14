@@ -1,2 +1,3 @@
 results.pickle
 *.pickle
+/detection/custom_model/dataset/*
