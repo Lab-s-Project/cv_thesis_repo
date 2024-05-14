@@ -19,7 +19,6 @@ class DangerDetection(object):
         self.in_polygon_cls = MSL(max_size=50) #list of all object that locates in the polygon
         xmsg(f'polygon: {self.risk_areas}')
 
-    
     def detect(self, result):
         self.result = result
         self.track_hist.push(self.result)
@@ -58,8 +57,6 @@ class DangerDetection(object):
                     if distance < (person_width * 4):
                         self.result.danger_level.append(3)
                         # print(f'{person_width} | {distance}')
-
-
 
         self.in_polygon_cls.empty()
         return self.result

@@ -30,7 +30,9 @@ class DLModel():
 
     #load yolo model for detection
     def load_model(self):
+        xmsg('loading yolo model from .pt file.')
         self.model = YOLO(f'{xconst.DL_MODEL_ROOT}/{self.model_type.value}.pt')
+        xmsg('yolo model loaded successfully.')
         return self.model
 
     #add polygon to the prediction

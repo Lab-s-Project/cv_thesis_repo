@@ -23,11 +23,13 @@ class XPolygon(object):
         self.get_first_frame()
 
     def get_first_frame(self):
+        xmsg('extract first frame for drawing polygon shape.')
         success, frame = self.cap.read()
         if not success: return
         self.frame = frame          
 
     def draw(self):
+        xmsg('drawing risk area as polygon shape.')
         if self.polygon_type is PolygonType.line:
             return self.draw_line()
         elif self.polygon_type is PolygonType.curve:

@@ -4,12 +4,10 @@
 #==============================#
 
 #import all required modules
+import cv2, os, pickle
 from .xenum import StreamType
 from .xutils import xmsg, xerr
 from tqdm import tqdm
-import cv2
-import os
-import pickle
 from modules.xutils import Config
 
 #class for managing stream
@@ -22,6 +20,7 @@ class Stream(object):
 
     #set file for loading cap from (eg. video file)
     def set_file_location(self, loc):
+        xmsg('target video file was set.')
         self.file_location = loc
     
     #get capture object
@@ -31,6 +30,7 @@ class Stream(object):
 
     #load capture object using cv2
     def load_cap(self):
+        xmsg('loading cv2 capture object.')
         #release cap if the app tries to reload the cap
         if self.cap: self.cap.release()
         if self.stream_type is StreamType.usb:
@@ -40,7 +40,7 @@ class Stream(object):
                 xerr('please set file location before loading Cap.')
             else:
                 self.cap = cv2.VideoCapture(self.file_location)
-        xmsg('cap loading completed.')
+        xmsg('capture object loading completed.')
         return self.cap
     
     #check and validate cap
