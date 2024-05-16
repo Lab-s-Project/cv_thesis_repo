@@ -4,8 +4,9 @@
 #==============================#
 
 #import all required modules
-from shapely.geometry import Polygon, Point
 import sys, math, cv2
+from shapely.geometry import Polygon, Point
+
 #change dir to import modules
 sys.path.append('..')
 from modules.xutils import xmsg, xerr

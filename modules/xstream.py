@@ -5,11 +5,11 @@
 
 #import all required modules
 import cv2, os, pickle
+from tqdm import tqdm
+from modules import xconst
 from .xenum import StreamType
 from .xutils import xmsg, xerr
-from tqdm import tqdm
 from modules.xutils import Config
-from modules import xconst
 
 #class for managing stream
 class Stream(object):

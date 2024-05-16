@@ -4,21 +4,22 @@
 #==============================#
 
 #import all required modules
-import sys, cv2, os, uuid, time
+import numpy as np
+import RPi.GPIO as GPIO
+from .xresult import XResult
 from ultralytics import YOLO
 from datetime import datetime
-import numpy as np
+import sys, cv2, os, uuid, time, pickle
 from .danger_detection import DangerDetection
-from .xresult import XResult
+
 #change dir to import modules
 sys.path.append('..')
-from modules.xenum import ModelType, StreamType
 from modules import xconst
-from modules.xutils import xmsg, xerr, add_polygon
 from modules.xplot import XPlot
-import pickle
 from modules.xgpio import XGPIO
-import RPi.GPIO as GPIO
+from modules.xenum import ModelType, StreamType
+from modules.xutils import xmsg, xerr, add_polygon
+
 #class handler for deep learning model operation
 class DLModel():
     def __init__(self, model_type = ModelType.yolov8n, stream = None, config=None):
@@ -28,6 +29,7 @@ class DLModel():
         self.model = None
         self.preds = []
         self.risk_areas = None
+        self.current_danger = 0
 
     #load yolo model for detection
     def load_model(self):
@@ -50,20 +52,13 @@ class DLModel():
         if (self.stream.stream_type is StreamType.file) and extract:
             frames = self.stream.extract_frames()
             for idx, i in enumerate(frames):
-                # if idx % 10:
-                #     xgpio.send(pins=[12], state=GPIO.HIGH)
-                #     xmsg(f'working on pin: {idx}')
-                    
-                # else:
-                #     xgpio.send(pins=[12], state=GPIO.LOW)
-                # time.sleep(0.2)
-                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
+                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS, conf=0.7)
                 # res = self.model.track(i, tracker='bytetrack.yaml', verbose=False, classes=xconst.DETECT_YOLO_CLASS, persist=True)
                 res = self.dangerD.detect(result=XResult(res))
-                if max(res.danger_level) > 0:
-                    xgpio.send(pins=[12], state=GPIO.LOW)
-                else:
-                    xgpio.send(pins=[12], state=GPIO.HIGH)
+                max_danger_level = max(res.danger_level)
+                if max_danger_level != self.current_danger:
+                    xgpio.current_state = GPIO.LOW if max_danger_level > 0 else GPIO.HIGH
+                    self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
@@ -82,6 +77,10 @@ class DLModel():
                     break
                 res = self.model(frame, verbose=False, classes=[0, 2])
                 res = self.dangerD.detect(result=XResult(res))
+                max_danger_level = max(res.danger_level)
+                if max_danger_level != self.current_danger:
+                    xgpio.current_state = GPIO.LOW if max_danger_level > 0 else GPIO.HIGH
+                    self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
@@ -92,7 +91,10 @@ class DLModel():
                 if key == ord('q'):
                     break
             cap.release()
+
+        #clean the cv2 and gpio after prediction completed.
         cv2.destroyAllWindows()
+        xgpio.release()
 
         #save prediction into mp4 file
         if save_file:
