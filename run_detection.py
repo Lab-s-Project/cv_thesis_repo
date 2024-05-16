@@ -4,12 +4,11 @@
 #==============================#
 
 #import all required modules
-from modules.xstream import Stream
-from modules.xenum import StreamType, ModelType, PolygonType
-from modules.xutils import Config, add_polygon
-from modules.xpolygon import XPolygon
 from detection.core import DLModel
-import cv2
+from modules.xstream import Stream
+from modules.xpolygon import XPolygon
+from modules.xutils import Config, add_polygon
+from modules.xenum import StreamType, ModelType, PolygonType
 
 #strating point of the detection
 if __name__ == '__main__':
@@ -23,16 +22,15 @@ if __name__ == '__main__':
     stream.set_file_location('./assets/videos/vid001.mp4')
     cap = stream.get_cap()
 
-    polygon = XPolygon(cap=cap, 
-                       polygon_type=PolygonType.line, 
-                       show_windows_size=config.show_windows_size)
-    polygons_list = polygon.draw()
-    # print(polygons_list)
-    # polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
+    # polygon = XPolygon(cap=cap, 
+    #                    polygon_type=PolygonType.line, 
+    #                    show_windows_size=config.show_windows_size)
+    # polygons_list = polygon.draw()
+    polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
     
     #start prediction
-    dlmodel = DLModel(model_type=ModelType.yolov8l, 
+    dlmodel = DLModel(model_type=ModelType.custom_best, 
                       stream=stream, 
                       config=config)
     dlmodel.set_risk_area(polygons_list)
-    dlmodel.detect(extract=True, save_file=False)
+    dlmodel.detect(extract=True, save_file=True)

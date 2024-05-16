@@ -4,8 +4,9 @@
 #==============================#
 
 #import all required modules
-import numpy as np
 import sys
+import numpy as np
+
 #change dir to import modules
 sys.path.append('..')
 from modules.xutils import Config

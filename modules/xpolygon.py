@@ -5,8 +5,8 @@
 
 #import all required modules
 import cv2
-from copy import deepcopy
 import numpy as np
+from copy import deepcopy
 from .xenum import PolygonType
 from .xutils import xmsg, xerr
 
