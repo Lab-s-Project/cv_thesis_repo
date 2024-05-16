@@ -17,7 +17,8 @@ from modules import xconst
 from modules.xutils import xmsg, xerr, add_polygon
 from modules.xplot import XPlot
 import pickle
-
+from modules.xgpio import XGPIO
+import RPi.GPIO as GPIO
 #class handler for deep learning model operation
 class DLModel():
     def __init__(self, model_type = ModelType.yolov8n, stream = None, config=None):
@@ -44,14 +45,25 @@ class DLModel():
     def detect(self, extract=True, save_file = False, filename=None):
         #load model if it is not loaded yet
         if not self.model: self.load_model()
-        
+        xgpio = XGPIO(pins=[5, 12, 18])
         #extract the frames before prediction instread of realtime prediction
         if (self.stream.stream_type is StreamType.file) and extract:
             frames = self.stream.extract_frames()
-            for i in frames:
+            for idx, i in enumerate(frames):
+                # if idx % 10:
+                #     xgpio.send(pins=[12], state=GPIO.HIGH)
+                #     xmsg(f'working on pin: {idx}')
+                    
+                # else:
+                #     xgpio.send(pins=[12], state=GPIO.LOW)
+                # time.sleep(0.2)
                 res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
                 # res = self.model.track(i, tracker='bytetrack.yaml', verbose=False, classes=xconst.DETECT_YOLO_CLASS, persist=True)
                 res = self.dangerD.detect(result=XResult(res))
+                if max(res.danger_level) > 0:
+                    xgpio.send(pins=[12], state=GPIO.LOW)
+                else:
+                    xgpio.send(pins=[12], state=GPIO.HIGH)
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)

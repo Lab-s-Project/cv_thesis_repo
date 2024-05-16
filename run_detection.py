@@ -23,15 +23,15 @@ if __name__ == '__main__':
     stream.set_file_location('./assets/videos/vid001.mp4')
     cap = stream.get_cap()
 
-    polygon = XPolygon(cap=cap, 
-                       polygon_type=PolygonType.line, 
-                       show_windows_size=config.show_windows_size)
-    polygons_list = polygon.draw()
+    # polygon = XPolygon(cap=cap, 
+    #                    polygon_type=PolygonType.line, 
+    #                    show_windows_size=config.show_windows_size)
+    # polygons_list = polygon.draw()
     # print(polygons_list)
-    # polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
+    polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
     
     #start prediction
-    dlmodel = DLModel(model_type=ModelType.yolov8l, 
+    dlmodel = DLModel(model_type=ModelType.yolov8m, 
                       stream=stream, 
                       config=config)
     dlmodel.set_risk_area(polygons_list)
