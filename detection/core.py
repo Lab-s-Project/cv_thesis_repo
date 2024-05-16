@@ -93,8 +93,8 @@ class DLModel():
             cap.release()
 
         #clean the cv2 and gpio after prediction completed.
-        cv2.destroyAllWindows()
         xgpio.release()
+        cv2.destroyAllWindows()
 
         #save prediction into mp4 file
         if save_file:
@@ -113,12 +113,13 @@ class DLModel():
         xmsg(f'wait - start saving prediction into file: "{filename}"')
 
         #prepare videowriter object
-        num_frames, height, width, _ = np.array(self.preds).shape
+        _, height, width, _ = np.array(self.preds[:1]).shape
         codec_id = "mp4v" # ID for a video codec.
         fourcc = cv2.VideoWriter_fourcc(*codec_id)
         out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=7, frameSize=(width, height))
 
         #write frames into file one by one
+        xmsg('start writing frames into mp4 file.')
         start_time = time.time()
         for pred_frame in self.preds:
             out.write(pred_frame)
