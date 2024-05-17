@@ -30,6 +30,14 @@ class DLModel():
         self.preds = []
         self.risk_areas = None
         self.current_danger = 0
+        self.setup_light_tower()
+
+    def setup_light_tower(self):
+        light_off = cv2.imread('./assets/images/light_turn_off.jpg')
+        light_on = cv2.imread('./assets/images/light_turn_on.jpg')
+        width, height = self.config.show_windows_size
+        self.turn_off_img = cv2.resize(light_off, (int(width/5), height))
+        self.turn_on_img = cv2.resize(light_on, (int(width/5), height))
 
     #load yolo model for detection
     def load_model(self):
@@ -61,8 +69,15 @@ class DLModel():
                     self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
+
+                
+
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas, color=polygon_color)
+
+                light_img = self.turn_on_img if max_danger_level > 0 else self.turn_off_img
+                pred = cv2.hconcat([pred, light_img])
+                
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Frame extracted', pred)
                 key = cv2.waitKey(1) & 0xFF
