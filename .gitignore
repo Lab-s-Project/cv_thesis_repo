@@ -1,3 +1,5 @@
 results.pickle
 *.pickle
 /detection/custom_model/dataset/*
+/assets/videos/recording*.mp4
+/assets/videos/predictions/62467*.mp4
