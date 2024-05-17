@@ -21,6 +21,7 @@ class ModelType(Enum):
     yolov8s = 'yolov8s'
     yolov8m = 'yolov8m'
     yolov8l = 'yolov8l'
+    custom_best = 'best'
 
     def __str__(self):
         return self.value

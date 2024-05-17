@@ -10,7 +10,7 @@ DL_MODEL_ROOT='./assets/models'
 PRED_SAVE_DIR='./assets/videos/predictions'
 
 #yolo classes for detection
-DETECT_YOLO_CLASS=[0, 2] #person and car
+DETECT_YOLO_CLASS=[0, 1] #person and car
 
 #constant value for plotting
 color = Config()
@@ -27,4 +27,4 @@ plot_config.bottom_point=True
 plot_config.danger_level=True
 plot_config.bottom_ellipse=True
 
-DEVELOPMENT=True
+DEVELOPMENT=False

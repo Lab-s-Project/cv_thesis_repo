@@ -4,19 +4,21 @@
 #==============================#
 
 #import all required modules
-import sys, cv2, os, uuid, time
+import numpy as np
+# import RPi.GPIO as GPIO
+from .xresult import XResult
 from ultralytics import YOLO
 from datetime import datetime
-import numpy as np
+import sys, cv2, os, uuid, time, pickle
 from .danger_detection import DangerDetection
-from .xresult import XResult
+
 #change dir to import modules
 sys.path.append('..')
-from modules.xenum import ModelType, StreamType
 from modules import xconst
-from modules.xutils import xmsg, xerr, add_polygon
 from modules.xplot import XPlot
-import pickle
+from modules.xgpio import XGPIO
+from modules.xenum import ModelType, StreamType
+from modules.xutils import xmsg, xerr, add_polygon
 
 #class handler for deep learning model operation
 class DLModel():
@@ -27,6 +29,15 @@ class DLModel():
         self.model = None
         self.preds = []
         self.risk_areas = None
+        self.current_danger = 0
+        self.setup_light_tower()
+
+    def setup_light_tower(self):
+        light_off = cv2.imread('./assets/images/light_turn_off.jpg')
+        light_on = cv2.imread('./assets/images/light_turn_on.jpg')
+        width, height = self.config.show_windows_size
+        self.turn_off_img = cv2.resize(light_off, (int(width/5), height))
+        self.turn_on_img = cv2.resize(light_on, (int(width/5), height))
 
     #load yolo model for detection
     def load_model(self):
@@ -44,18 +55,25 @@ class DLModel():
     def detect(self, extract=True, save_file = False, filename=None):
         #load model if it is not loaded yet
         if not self.model: self.load_model()
-        
+        xgpio = XGPIO(pins=[5, 12, 18])
         #extract the frames before prediction instread of realtime prediction
         if (self.stream.stream_type is StreamType.file) and extract:
             frames = self.stream.extract_frames()
-            for i in frames:
-                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS)
+            for idx, i in enumerate(frames):
+                res = self.model(i, verbose=False, classes=xconst.DETECT_YOLO_CLASS, conf=0.7)
                 # res = self.model.track(i, tracker='bytetrack.yaml', verbose=False, classes=xconst.DETECT_YOLO_CLASS, persist=True)
                 res = self.dangerD.detect(result=XResult(res))
+                max_danger_level = max(res.danger_level)
+                if max_danger_level != self.current_danger:
+                    xgpio.current_state = xgpio.gpio.LOW if max_danger_level > 0 else xgpio.gpio.HIGH
+                    self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas, color=polygon_color)
+                #update tower light image
+                light_img = self.turn_on_img if max_danger_level > 0 else self.turn_off_img
+                pred = cv2.hconcat([pred, light_img])
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Frame extracted', pred)
                 key = cv2.waitKey(1) & 0xFF
@@ -70,16 +88,26 @@ class DLModel():
                     break
                 res = self.model(frame, verbose=False, classes=[0, 2])
                 res = self.dangerD.detect(result=XResult(res))
+                max_danger_level = max(res.danger_level)
+                if max_danger_level != self.current_danger:
+                    xgpio.current_state = xgpio.gpio.LOW if max_danger_level > 0 else xgpio.gpio.HIGH
+                    self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
+                #update tower light image
+                light_img = self.turn_on_img if max_danger_level > 0 else self.turn_off_img
+                pred = cv2.hconcat([pred, light_img])
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Realtime', pred)
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord('q'):
                     break
             cap.release()
+
+        #clean the cv2 and gpio after prediction completed.
+        xgpio.release()
         cv2.destroyAllWindows()
 
         #save prediction into mp4 file
@@ -99,12 +127,13 @@ class DLModel():
         xmsg(f'wait - start saving prediction into file: "{filename}"')
 
         #prepare videowriter object
-        num_frames, height, width, _ = np.array(self.preds).shape
+        _, height, width, _ = np.array(self.preds[:1]).shape
         codec_id = "mp4v" # ID for a video codec.
         fourcc = cv2.VideoWriter_fourcc(*codec_id)
         out = cv2.VideoWriter(os.path.join(xconst.PRED_SAVE_DIR, filename), fourcc=fourcc, fps=7, frameSize=(width, height))
 
         #write frames into file one by one
+        xmsg('start writing frames into mp4 file.')
         start_time = time.time()
         for pred_frame in self.preds:
             out.write(pred_frame)

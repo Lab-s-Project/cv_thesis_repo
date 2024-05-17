@@ -5,11 +5,11 @@
 
 #import all required modules
 import cv2, os, pickle
+from tqdm import tqdm
+from modules import xconst
 from .xenum import StreamType
 from .xutils import xmsg, xerr
-from tqdm import tqdm
 from modules.xutils import Config
-from modules import xconst
 
 #class for managing stream
 class Stream(object):
@@ -46,7 +46,7 @@ class Stream(object):
     
     #check and validate cap
     def validate_cap(self):
-        self.load_cap()
+        if not self.cap: self.load_cap()
         if not self.cap.isOpened():
             xerr('cap is not opened.')
             return False

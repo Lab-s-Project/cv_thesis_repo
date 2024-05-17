@@ -4,8 +4,9 @@
 #==============================#
 
 #import all required modules
-from shapely.geometry import Polygon, Point
 import sys, math, cv2
+from shapely.geometry import Polygon, Point
+
 #change dir to import modules
 sys.path.append('..')
 from modules.xutils import xmsg, xerr
@@ -33,7 +34,7 @@ class DangerDetection(object):
                     person_objects.append(idx)
                     self.result.xboxes[idx].is_danger = True
                     self.result.danger_level.append(1)
-                elif int(cl)== 2:
+                elif int(cl)== 1:
                     car_objects.append(idx)
         #when there are both person and car in the risk area
         if len(list(set(self.in_polygon_cls.get_list()))) == 2: self.result.danger_level.append(2)
@@ -54,7 +55,7 @@ class DangerDetection(object):
 
                     # Apply the Euclidean distance formula
                     distance = math.sqrt(dx**2 + dy**2)
-                    if distance < (person_width * 4):
+                    if distance < (person_width * 5):
                         self.result.danger_level.append(3)
                         # print(f'{person_width} | {distance}')
 
