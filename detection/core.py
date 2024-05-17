@@ -5,7 +5,7 @@
 
 #import all required modules
 import numpy as np
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 from .xresult import XResult
 from ultralytics import YOLO
 from datetime import datetime
@@ -65,7 +65,7 @@ class DLModel():
                 res = self.dangerD.detect(result=XResult(res))
                 max_danger_level = max(res.danger_level)
                 if max_danger_level != self.current_danger:
-                    xgpio.current_state = GPIO.LOW if max_danger_level > 0 else GPIO.HIGH
+                    xgpio.current_state = xgpio.gpio.LOW if max_danger_level > 0 else xgpio.gpio.HIGH
                     self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
@@ -90,7 +90,7 @@ class DLModel():
                 res = self.dangerD.detect(result=XResult(res))
                 max_danger_level = max(res.danger_level)
                 if max_danger_level != self.current_danger:
-                    xgpio.current_state = GPIO.LOW if max_danger_level > 0 else GPIO.HIGH
+                    xgpio.current_state = xgpio.gpio.LOW if max_danger_level > 0 else xgpio.gpio.HIGH
                     self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
