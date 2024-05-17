@@ -69,15 +69,11 @@ class DLModel():
                     self.current_danger = max_danger_level
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
-
-                
-
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas, color=polygon_color)
-
+                #update tower light image
                 light_img = self.turn_on_img if max_danger_level > 0 else self.turn_off_img
                 pred = cv2.hconcat([pred, light_img])
-                
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Frame extracted', pred)
                 key = cv2.waitKey(1) & 0xFF
@@ -100,6 +96,9 @@ class DLModel():
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
+                #update tower light image
+                light_img = self.turn_on_img if max_danger_level > 0 else self.turn_off_img
+                pred = cv2.hconcat([pred, light_img])
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Realtime', pred)
                 key = cv2.waitKey(1) & 0xFF
