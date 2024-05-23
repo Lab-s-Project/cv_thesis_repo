@@ -46,7 +46,7 @@ class Stream(object):
     
     #check and validate cap
     def validate_cap(self):
-        self.load_cap()
+        if not self.cap: self.load_cap()
         if not self.cap.isOpened():
             xerr('cap is not opened.')
             return False

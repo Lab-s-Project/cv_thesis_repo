@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # #define stream object
     stream = Stream(stream_type = StreamType.file, config = config)
-    stream.set_file_location('./assets/videos/recording_2024-04-17_08-50-00.mp4')
+    stream.set_file_location('./assets/videos/vid001.mp4')
     cap = stream.get_cap()
 
     polygon = XPolygon(cap=cap, 
@@ -27,40 +27,10 @@ if __name__ == '__main__':
                        show_windows_size=config.show_windows_size)
     polygons_list = polygon.draw()
     # polygons_list=[[(928, 218), (737, 190), (435, 155), (195, 143), (30, 315), (373, 350), (740, 396), (903, 427), (929, 219)]]
-    # polygons_list = [[(231, 212), (383, 214), (546, 220), (766, 240), (992, 267), (1400, 323), (1687, 323), (1671, 703), (1203, 612), (643, 529), (344, 491), (33, 447), (232, 213)]]
-    
+
     #start prediction
     dlmodel = DLModel(model_type=ModelType.custom_best, 
                       stream=stream, 
                       config=config)
     dlmodel.set_risk_area(polygons_list)
     dlmodel.detect(extract=True, save_file=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
