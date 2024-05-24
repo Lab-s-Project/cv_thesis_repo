@@ -18,6 +18,19 @@ color.GREENISH=(0, 181, 6)
 color.RED=(0, 0, 255)
 color.WHITE=(255, 255, 255)
 
+#gpio & light tower color
+danger_pin_num = {
+    1: 18,
+    2: 5,
+    3: 12
+}
+
+pin_num_color = {
+    danger_pin_num[1]: 'green',
+    danger_pin_num[2]: 'yellow',
+    danger_pin_num[3]: 'red'
+}
+
 #plotting configuratiion
 plot_config = Config()
 plot_config.bounding_box=False
@@ -27,4 +40,4 @@ plot_config.bottom_point=True
 plot_config.danger_level=True
 plot_config.bottom_ellipse=True
 
-DEVELOPMENT=False
+DEVELOPMENT=True
