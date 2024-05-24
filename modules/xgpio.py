@@ -31,6 +31,7 @@ class XGPIO(object):
         self.running = False
         self.send_signal_thread = None
         self.current_state = self.gpio.HIGH
+        self.trigger_pins = []
         self.setup()
         if sra: self.start_thread(pins=[12])
     
@@ -46,12 +47,14 @@ class XGPIO(object):
     
     def send_thread(self, pins):
         assert len(pins) != 0, 'incorrect pins number list.'
+
         #repeatedly send signal to the tower
         while True:
-            if self.running:
-                self.gpio.output(pins, self.current_state)
-                time.sleep(0.1)
-            else:
+            if (self.running) and (len(self.trigger_pins) > 0):
+                self.gpio.output(self.trigger_pins, self.current_state)
+            time.sleep(0.2)
+
+            if not self.running:
                 break
     
     def start_thread(self, pins):
