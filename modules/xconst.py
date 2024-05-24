@@ -40,4 +40,4 @@ plot_config.bottom_point=True
 plot_config.danger_level=True
 plot_config.bottom_ellipse=True
 
-DEVELOPMENT=True
+DEVELOPMENT=False

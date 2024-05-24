@@ -33,14 +33,14 @@ class DLModel():
         self.setup_light_tower()
 
     def setup_light_tower(self):
-        green_on = cv2.imread('./assets/images/light_turn_off.jpg')
-        yellow_on = cv2.imread('./assets/images/light_turn_on.jpg')
-        red_on = cv2.imread('./assets/images/light_turn_on.jpg')
-        green_yellow_on = cv2.imread('./assets/images/light_turn_on.jpg')
-        red_yellow_on = cv2.imread('./assets/images/light_turn_on.jpg')
-        green_red_on = cv2.imread('./assets/images/light_turn_on.jpg')
-        green_red_yellow_on = cv2.imread('./assets/images/light_turn_on.jpg')
-        green_red_yellow_off = cv2.imread('./assets/images/light_turn_on.jpg')
+        green_on = cv2.imread('./assets/images/green_on.jpg')
+        yellow_on = cv2.imread('./assets/images/yellow_on.jpg')
+        red_on = cv2.imread('./assets/images/red_on.jpg')
+        green_yellow_on = cv2.imread('./assets/images/green_yellow_on.jpg')
+        red_yellow_on = cv2.imread('./assets/images/red_yellow_on.jpg')
+        green_red_on = cv2.imread('./assets/images/green_red_on.jpg')
+        green_red_yellow_on = cv2.imread('./assets/images/green_red_yellow_on.jpg')
+        green_red_yellow_off = cv2.imread('./assets/images/green_red_yellow_off.jpg')
 
         width, height = self.config.show_windows_size
         self.tower_light_imgs = Config()
@@ -88,13 +88,11 @@ class DLModel():
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
                 if self.risk_areas: pred = add_polygon(pred, self.risk_areas, color=polygon_color)
                 #update tower light image
-                light_img = self.red_on #self.turn_on_img if max_danger_level > 0 else self.turn_off_img
-                light_img_name = 'green_yellow_red_off'
+                light_img_name = 'green_red_yellow_off'
                 if max_danger_level > 0:
                     light_img_names = [xconst.pin_num_color[j] for j in [xconst.danger_pin_num[i] for i in xconst.danger_pin_num if i in res.danger_level]]
-                    light_img_names
-                    light_img_name = ['_'.join()][0]
-                print(light_img_name)
+                    light_img_names.sort()
+                    light_img_name = ['_'.join(light_img_names)][0]
                 pred = cv2.hconcat([pred, self.tower_light_imgs[light_img_name]])
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Frame extracted', pred)
@@ -117,10 +115,14 @@ class DLModel():
                 pred = XPlot(result=res, config=xconst.plot_config).plot()
                 pred = cv2.resize(pred, self.config.show_windows_size)
                 polygon_color = (0, 0, 255) if max(res.danger_level) != 0 else (255, 0, 0)
-                if self.risk_areas: pred = add_polygon(pred, self.risk_areas)
+                
                 #update tower light image
-                light_img = self.turn_on_img if max_danger_level > 0 else self.turn_off_img
-                pred = cv2.hconcat([pred, light_img])
+                light_img_name = 'green_red_yellow_off'
+                if max_danger_level > 0:
+                    light_img_names = [xconst.pin_num_color[j] for j in [xconst.danger_pin_num[i] for i in xconst.danger_pin_num if i in res.danger_level]]
+                    light_img_names.sort()
+                    light_img_name = ['_'.join(light_img_names)][0]
+                pred = cv2.hconcat([pred, self.tower_light_imgs[light_img_name]])
                 self.preds.append(pred)
                 cv2.imshow('Prediction - Realtime', pred)
                 key = cv2.waitKey(1) & 0xFF
