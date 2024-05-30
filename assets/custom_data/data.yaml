@@ -3,9 +3,9 @@
 
 
 #path: ../datasets/coco128  # dataset root dir
-train: \assets\custom_data\train\images
-val: \assets\custom_data\val\images
-test: \assets\custom_data\test\images
+train: D:\18. Thesis\2. Car-Human Test Detection\4. cv_thesis_repo\assets\custom_data\train\images
+val: D:\18. Thesis\2. Car-Human Test Detection\4. cv_thesis_repo\assets\custom_data\val\images
+test: D:\18. Thesis\2. Car-Human Test Detection\4. cv_thesis_repo\assets\custom_data\test\images
 
 # Classes
 nc: 2  # number of classes
