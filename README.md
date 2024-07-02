@@ -1,4 +1,4 @@
-# _Implementation of Intelligent Video System for Pedestrian Safety Detection_
+# _Implementation of Pedestrian Danger Prevention System using Deep Learning and Computer Vision_
 Munirot Thon
 
 <img src="./assets/images/for_readme.gif" width="100%">
